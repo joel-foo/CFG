@@ -1,54 +1,30 @@
-const User = require('../models/User');
+const tryCatch = require('../utils/tryCatch');
+const userService = require('../service/userService');
 
-module.exports = {
-  post: async (req, res) => {
-    const data = new User({
-      name: req.body.name,
-      age: req.body.age,
-    });
-    try {
-      const dataToSave = await data.save();
-      res.status(200).json(dataToSave);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  },
-  getAll: async (req, res) => {
-    try {
-      const data = await User.find();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
-  getOne: async (req, res) => {
-    try {
-      const data = await User.findById(req.params.id);
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
-  update: async (req, res) => {
-    try {
-      const id = req.params.id;
-      const updatedData = req.body;
-      const options = { new: true, runValidators: true };
+module.exports.post = tryCatch(async (req, res) => {
+  const dataToSave = await userService.createUser(req.body);
+  res.status(200).json(dataToSave);
+});
 
-      const result = await User.findByIdAndUpdate(id, updatedData, options);
+module.exports.getAll = tryCatch(async (req, res) => {
+  const data = await userService.getAllUsers();
+  res.status(200).json(data);
+});
 
-      res.send(result);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  },
-  delete: async (req, res) => {
-    try {
-      const id = req.params.id;
-      const data = await User.findByIdAndDelete(id);
-      res.send(`Document with ${data.name} has been deleted..`);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  },
-};
+module.exports.getOne = tryCatch(async (req, res) => {
+  const data = await userService.getUserById(req.params);
+  res.status(200).json(data);
+});
+
+module.exports.update = tryCatch(async (req, res) => {
+  const data = await userService.updateUser({
+    id: req.params.id,
+    updateInfo: req.body,
+  });
+  res.status(200).send(data);
+});
+
+module.exports.delete = tryCatch(async (req, res) => {
+  const data = await userService.deleteUser(req.params);
+  res.status(200).send(`Document with ${data.name} has been deleted..`);
+});

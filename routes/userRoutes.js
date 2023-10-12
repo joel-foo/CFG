@@ -1,5 +1,6 @@
 const express = require('express');
 const userController = require('../controllers/userController');
+const errorHandler = require('../middleware/errorHandler');
 
 const router = express.Router();
 
@@ -17,5 +18,7 @@ router.patch('/update/:id', userController.update);
 
 //Delete by ID Method
 router.delete('/delete/:id', userController.delete);
+
+router.use(errorHandler);
 
 module.exports = router;
